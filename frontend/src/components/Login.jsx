@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { GoogleLogin } from "@react-oauth/google";
 
 const INITIAL_FORM = { email: "", password: "" };
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:4000").replace(/\/+$/, "");
@@ -59,26 +60,68 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
             // If backend sends a failure status or missing data
             if (!data?.token || !data?.user) {
-                throw new Error(data?.message || "Invalid credentials"); 
+                throw new Error(data?.message || "Invalid credentials");
             }
 
             localStorage.setItem("token", data.token);
             localStorage.setItem("userId", data.user._id);
-            
-            setForm(INITIAL_FORM);           
+
+            setForm(INITIAL_FORM);
             onSubmit?.({ user: data.user, token: data.token });
-            
+
             toast.success("Login successful! Redirecting...");
             setTimeout(() => navigate("/"), 1500);
 
         } catch (err) {
             // ✅ Correctly capture and display the error message
             const errorMessage = err.response?.data?.message || err.message || "Login failed. Please try again.";
-            setLoginError(errorMessage); 
-            toast.error(errorMessage); 
+            setLoginError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
-        } 
+        }
+    };
+
+    const handleGoogleLogin = async (credentialResponse) => {
+        setLoading(true);
+        setLoginError("");
+
+        try {
+            const { data } = await axios.post(
+                `${API_URL}/api/user/google`,
+                {
+                    credential: credentialResponse.credential,
+                }
+            );
+
+            if (!data?.token || !data?.user) {
+                throw new Error(data?.message || "Google login failed");
+            }
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.user.id);
+
+            onSubmit?.({
+                user: data.user,
+                token: data.token,
+            });
+
+            toast.success("Google login successful!");
+
+            navigate("/");
+
+        } catch (err) {
+            const errorMessage =
+                err.response?.data?.message ||
+                err.message ||
+                "Google login failed.";
+
+            setLoginError(errorMessage);
+            toast.error(errorMessage);
+
+        } finally {
+            setLoading(false);
+        }
     };
 
     const fields = [
@@ -147,22 +190,28 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                 <button type="submit" className={BUTTON_CLASSES} disabled={loading}>
                     {loading ? "Logging in..." : (
                         <div className="flex items-center justify-center gap-2">
-                            <LogIn className="w-4 h-4" /> Login
+                            <LogIn className="w-4 h-4" />
+                            Login
                         </div>
                     )}
                 </button>
-            </form>
 
-             {/* <p className="text-center text-sm text-gray-600 mt-6">
-                {" "}
-                <button
-                    type="button"
-                    onClick={onSwitchMode}
-                    className="text-purple-600 hover:text-purple-700 hover:underline font-medium transition-colors"
-                >
-                    Forgot Password?
-                </button>
-            </p> */}
+                <div className="my-4 flex items-center">
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <span className="px-3 text-sm text-gray-500">OR</span>
+                    <div className="flex-1 border-t border-gray-300"></div>
+                </div>
+
+                <div className="flex justify-center">
+                    <GoogleLogin
+                        onSuccess={handleGoogleLogin}
+                        onError={() => {
+                            toast.error("Google Login Failed");
+                        }}
+                    />
+                </div>
+
+            </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">
                 Don't have an account?{" "}

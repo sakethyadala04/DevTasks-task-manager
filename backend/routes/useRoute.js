@@ -1,7 +1,14 @@
 import express from 'express';
-import { registerUser, loginUser, getCurrentUser , updateProfile , changePassword} from '../controllers/userController.js';
-
 import authMiddleware from '../middleware/auth.js';
+
+import {
+    registerUser,
+    loginUser,
+    googleLogin,
+    getCurrentUser,
+    updateProfile,
+    changePassword,
+} from "../controllers/userController.js";
 
 const userRouter = express.Router();
 
@@ -9,6 +16,7 @@ const userRouter = express.Router();
 
 userRouter.post('/register' , registerUser);
 userRouter.post('/login' , loginUser);
+userRouter.post("/google", googleLogin);
 
 // PRIVATE LINKS protected also
 

@@ -2,6 +2,7 @@ import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
+import { verifyGoogleToken } from "../services/googleAuthService.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -54,7 +55,7 @@ export const registerUser = async (req, res) => {
 // LOGIN
 export const loginUser = async (req, res) => {
   try {
-    
+
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ success: false, message: 'Email and password required' });
@@ -143,5 +144,79 @@ export const changePassword = async (req, res) => {
   } catch (err) {
     console.error('changePassword error:', err);
     return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+// Google Login
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required",
+      });
+    }
+
+    const googleUser = await verifyGoogleToken(credential);
+
+    if (!googleUser.emailVerified) {
+      return res.status(401).json({
+        success: false,
+        message: "Google email is not verified",
+      });
+    }
+
+    let user = await User.findOne({ email: googleUser.email });
+
+    // New user -> create account
+    if (!user) {
+      user = await User.create({
+        name: googleUser.name,
+        email: googleUser.email,
+        password: null,
+        googleId: googleUser.googleId,
+        avatar: googleUser.picture,
+      });
+    }
+
+    // Existing user -> link Google account if not already linked
+    if (!user.googleId) {
+      user.googleId = googleUser.googleId;
+    }
+
+    if (!user.avatar) {
+      user.avatar = googleUser.picture;
+    }
+
+    if (user.isModified()) {
+      await user.save();
+    }
+
+    // Generate our application's JWT
+    const token = createToken(user._id);
+
+    // Send response
+    return res.status(200).json({
+      success: true,
+      message: "Google login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      },
+      token,
+    });
+
+  } catch (error) {
+    console.error("googleLogin error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
   }
 };
