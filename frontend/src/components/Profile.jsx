@@ -6,7 +6,7 @@ import { BACK_BUTTON, DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, SEC
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000';
+const API_URL = 'http://localhost:5000';
 
 const Profile = ({ setCurrentUser, onLogout }) => {
     // 1. Core State

@@ -6,11 +6,11 @@ import authMiddleware from '../middleware/auth.js';
 
 const taskRouter = express.Router();
 
-taskRouter.route('/op')
+taskRouter.route('/')
     .get(authMiddleware, getTasks)
     .post(authMiddleware, createTask);
 
-taskRouter.route('/:id/op')
+taskRouter.route('/:id')
     .get(authMiddleware, getTaskById)
     .put(authMiddleware, updateTask)
     .delete(authMiddleware, deleteTask)

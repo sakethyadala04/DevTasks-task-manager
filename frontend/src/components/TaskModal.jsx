@@ -14,7 +14,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:4000/api/tasks';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
 
 const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave }) => {
   const [taskData, setTaskData] = useState(DEFAULT_TASK);
@@ -76,8 +76,8 @@ const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave }) => {
       try {
         const isEdit = Boolean(taskData.id);
         const url = isEdit
-          ? `${API_BASE}/${taskData.id}/op`
-          : `${API_BASE}/op`;
+          ? `${API_BASE}/${taskData.id}`
+          : API_BASE;
 
         const payload = {
           ...taskData,

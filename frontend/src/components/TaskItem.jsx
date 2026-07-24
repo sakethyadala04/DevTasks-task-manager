@@ -10,7 +10,7 @@ import {
 } from '../assets/dummy';
 import TaskMoodal from './TaskModal';
 
-const API_BASE = 'http://localhost:4000/api/tasks';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
 
 const TaskItem = ({
   task,
@@ -63,7 +63,7 @@ const TaskItem = ({
 
     try {
       await axios.put(
-        `${API_BASE}/${task._id}/op`,
+        `${API_BASE}/${task._id}`,
         { completed: newStatus },
         { headers: getAuthHeaders() }
       );
@@ -84,7 +84,7 @@ const TaskItem = ({
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}/${task._id}/op`, {
+      await axios.delete(`${API_BASE}/${task._id}`, {
         headers: getAuthHeaders(),
       });
       onRefresh?.();
@@ -97,7 +97,7 @@ const TaskItem = ({
     try {
       const payload = (({ title, description, priority, duedate, completed }) =>
         ({ title, description, priority, duedate, completed }))(updatedTask)
-      await axios.put(`${API_BASE}/${task._id}/op`, payload, {
+      await axios.put(`${API_BASE}/${task._id}`, payload, {
         headers: getAuthHeaders(),
       })
       setShowEditModal(false);

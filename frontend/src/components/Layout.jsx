@@ -21,17 +21,18 @@ const Layout = ({ onLogout, user, children }) => {
                 throw new Error('No authentication token found');
             }
 
-            const { data } = await axios.get('http://localhost:4000/api/tasks/op', {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const { data } = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/tasks`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
-
-            //    console.log("Backend Response:", data); // 👈 CHECK THIS IN YOUR BROWSER CONSOLE
+            );
 
             const array = Array.isArray(data) ? data :
-                          Array.isArray(data?.tasks) ? data.tasks :
-                          Array.isArray(data?.data) ? data.data : [];
+                Array.isArray(data?.tasks) ? data.tasks :
+                    Array.isArray(data?.data) ? data.data : [];
             setTasks(array);
         } catch (error) {
             console.error(error);

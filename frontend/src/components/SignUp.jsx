@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-const API_URL = "http://localhost:4000";
+const API_URL = "http://localhost:5000";
 const INITIAL_FORM = { name: '', email: '', password: '' };
 
 const SignUp = ({ onSwitchMode }) => {

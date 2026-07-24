@@ -30,7 +30,7 @@ import TaskItem from "../components/TaskItem.jsx";
 import TaskModal from "../components/TaskModal.jsx";
 import axios from "axios";
 
-const API_BASE = "http://localhost:4000/api/tasks";
+
 
 const Dashboard = () => {
     const { tasks = [], refreshTasks } = useOutletContext();
@@ -106,7 +106,7 @@ const Dashboard = () => {
             try {
                 if (taskData.id) {
                     await axios.put(
-                        `${API_BASE}/${taskData.id}/op`,
+                        `${API_BASE}/${taskData.id}`,
                         taskData
                     );
                 }
