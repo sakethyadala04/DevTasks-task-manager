@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock, LogIn } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { GoogleLogin } from "@react-oauth/google";
+
 
 const INITIAL_FORM = { email: "", password: "" };
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:5000").replace(/\/+$/, "");
@@ -13,7 +14,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState(INITIAL_FORM);
-    const [rememberMe, setRememberMe] = useState(false);
+
     const [loginError, setLoginError] = useState("");
 
     const navigate = useNavigate();
@@ -45,11 +46,6 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoginError(""); // Clear previous errors on new attempt
-
-        if (!rememberMe) {
-            toast.error("Please enable 'Remember Me' to login."); // ✅ Added toast for immediate feedback
-            return;
-        }
 
         setLoading(true);
         try {
@@ -132,6 +128,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     return (
         <div className="max-w-md bg-white w-full shadow-lg border border-purple-100 rounded-xl p-8">
             <div className="mb-6 text-center">
+                
                 <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center mb-4">
                     <LogIn className="w-8 h-8 text-white" />
                 </div>
@@ -152,6 +149,11 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                         <Icon className="w-5 h-5 text-purple-500 mr-2" />
                         <input
                             type={isPassword && showPassword ? "text" : type}
+                            autoComplete={
+                                name === "email"
+                                    ? "email"
+                                    : "current-password"
+                            }
                             placeholder={placeholder}
                             value={form[name]}
                             onChange={(e) => setForm({ ...form, [name]: e.target.value })}
@@ -170,22 +172,12 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                     </div>
                 ))}
 
-                <div className="flex items-center">
-                    <input
-                        type="checkbox"
-                        id="rememberMe"
-                        required
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded cursor-pointer"
-                    />
-                    <label
-                        htmlFor="rememberMe"
-                        className="ml-2 block text-sm text-gray-700 cursor-pointer"
-                    >
-                        Remember Me
-                    </label>
-                </div>
+                <Link
+                    to="/forgot-password"
+                    className="block ml-2 text-sm text-purple-600 hover:text-purple-700 hover:underline"
+                >
+                    Forgot Password?
+                </Link>
 
                 <button type="submit" className={BUTTON_CLASSES} disabled={loading}>
                     {loading ? "Logging in..." : (

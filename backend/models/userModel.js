@@ -30,13 +30,39 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+
+    // Email Verification
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+
+    verificationTokenExpires: {
+      type: Date,
+      default: null,
+    },
+
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordTokenExpires: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const userModel =
-  mongoose.models.user || mongoose.model("User", userSchema);
+const User =
+  mongoose.models.User || mongoose.model("User", userSchema);
 
-export default userModel;
+export default User;

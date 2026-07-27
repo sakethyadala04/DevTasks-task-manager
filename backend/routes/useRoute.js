@@ -5,9 +5,13 @@ import {
     registerUser,
     loginUser,
     googleLogin,
+    verifyEmail,
+    forgotPassword,
+    resetPassword,
     getCurrentUser,
     updateProfile,
     changePassword,
+    resendVerificationEmail,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -17,6 +21,11 @@ const userRouter = express.Router();
 userRouter.post('/register' , registerUser);
 userRouter.post('/login' , loginUser);
 userRouter.post("/google", googleLogin);
+userRouter.get("/verify-email", verifyEmail);
+
+userRouter.post('/forgot-password', forgotPassword);
+userRouter.post('/reset-password', resetPassword);
+userRouter.post("/resend-verification", resendVerificationEmail);
 
 // PRIVATE LINKS protected also
 

@@ -9,6 +9,11 @@ import Dashboard from './pages/Dashboard.jsx';
 import PendingPages from './pages/PendingPages.jsx';
 import CompletedPages from './pages/CompletedPages.jsx';
 import Profile from './components/Profile.jsx';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
+import VerifyEmail from "./pages/VerifyEmail";
+import ResendVerification from "./pages/ResendVerification";
 
 const App = () => {
 
@@ -27,63 +32,88 @@ const App = () => {
     }
   }, [currentUser]);
 
-const handleAuthSubmit = ({ user, token }) => {
-  if (token) localStorage.setItem("token", token);
+  const handleAuthSubmit = ({ user, token }) => {
+    if (token) localStorage.setItem("token", token);
 
-  // if (user && user.id) {
-  //   localStorage.setItem("userId", user.id)
-  // }
+    // if (user && user.id) {
+    //   localStorage.setItem("userId", user.id)
+    // }
 
-setCurrentUser({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`,
-});
+    setCurrentUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`,
+    });
 
-  navigate("/", { replace: true });
-};
+    navigate("/", { replace: true });
+  };
 
-const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("currentUser");
-  localStorage.removeItem("userId");  
-  setCurrentUser(null);
-  console.log("Logout clicked");
-  navigate('/login', { replace: true });
-};
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("userId");
+    setCurrentUser(null);
+    console.log("Logout clicked");
+    navigate('/login', { replace: true });
+  };
 
-const ProtectedLayout = () => {
+  const ProtectedLayout = () => {
+    return (
+      <Layout user={currentUser} onLogout={handleLogout}>
+        <Outlet />
+      </Layout>
+    );
+  }
+
   return (
-    <Layout user={currentUser} onLogout={handleLogout}>
-      <Outlet />
-    </Layout>
+    <Routes>
+      <Route path='/login' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
+        <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
+      </div>} />
+
+      <Route path='/signup' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
+        <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
+      </div>} />
+
+      <Route path="/verify-email" element={<VerifyEmail />} />
+
+      <Route
+        path="/forgot-password"
+        element={
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <ForgotPassword />
+          </div>
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <ResetPassword />
+          </div>
+        }
+      />
+
+      <Route
+        path="/resend-verification"
+        element={<ResendVerification />}
+      />
+
+      <Route element={currentUser ? <ProtectedLayout /> :
+        <Navigate to="/login" replace />} >
+
+        <Route path='/' element={<Dashboard />} />
+        <Route path='/pending' element={<PendingPages />} />
+        <Route path='/complete' element={<CompletedPages />} />
+        <Route path='/profile' element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
+      </Route>
+
+
+      <Route path='*' element={<Navigate to={currentUser ? "/" : "/login"} replace />} />
+    </Routes>
   );
-}
-
-return (
-  <Routes>
-    <Route path='/login' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-      <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
-    </div>} />
-
-    <Route path='/signup' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-      <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
-    </div>} />
-
-    <Route element={currentUser ? <ProtectedLayout /> :
-      <Navigate to="/login" replace />} >
-
-      <Route path='/' element={<Dashboard />} />
-      <Route path='/pending' element={<PendingPages />} />
-      <Route path='/complete' element={<CompletedPages />} />
-      <Route path='/profile' element={<Profile user={currentUser}  setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
-    </Route>
-
-
-    <Route path='*' element={<Navigate to={currentUser ? "/" : "/login"} replace />} />
-  </Routes>
-);
 }
 
 export default App;
