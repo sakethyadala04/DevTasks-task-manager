@@ -4,6 +4,9 @@ import toast from "react-hot-toast";
 import { Mail } from "lucide-react";
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 
 
@@ -80,6 +83,14 @@ const ResendVerification = () => {
                     >
                         {loading ? "Sending..." : "Send Verification Email"}
                     </button>
+
+                    <Link
+                        to="/login"
+                        className="flex items-center justify-center gap-2 mt-6 text-purple-600 hover:underline"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Login
+                    </Link>
 
                 </form>
 

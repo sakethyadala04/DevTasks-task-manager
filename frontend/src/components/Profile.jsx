@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, UserCircle, Save, Shield, Lock, LogOut, Eye, EyeOff } from 'lucide-react';
+import { UserCircle, Save, Shield, Lock, LogOut, Eye, EyeOff } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { BACK_BUTTON, DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, SECTION_WRAPPER, securityFields } from '../assets/dummy.jsx';
-import { useNavigate } from 'react-router-dom';
+import { DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, SECTION_WRAPPER, securityFields } from '../assets/dummy.jsx';
+
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000';
@@ -19,7 +19,6 @@ const Profile = ({ setCurrentUser, onLogout }) => {
 
     // 2. Individual Visibility State (Using an object for independent toggles)
     const [showPasswords, setShowPasswords] = useState({});
-    const navigate = useNavigate();
 
     // Fetch User Data on Load
     useEffect(() => {
@@ -58,7 +57,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
             } else {
                 toast.error(data.message);
             }
-        } catch (err) { 
+        } catch (err) {
             toast.error(err.response?.data?.message || "Failed to update profile.");
         }
     };
@@ -111,11 +110,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
         <div className='min-h-screen bg-gray-50'>
             <ToastContainer position='top-center' autoClose={3000} />
             <div className='max-w-4xl mx-auto p-6'>
-                {/* Back Button with History Fix */}
-                <button onClick={() => navigate('/', { replace: true })} className={BACK_BUTTON}>
-                    <ChevronLeft className='w-5 h-5 mr-1' />
-                    Back to Dashboard
-                </button>
+
 
                 {/* Header Section */}
                 <div className='flex items-center gap-4 mb-8'>
@@ -129,7 +124,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                     </div>
                 </div>
 
-                <div className='grid md:grid-cols-2 gap-8'>
+                <div className="space-y-8">
                     {/* Personal Information Section */}
                     <section className={SECTION_WRAPPER}>
                         <div className='flex items-center gap-2 mb-6'>
@@ -143,9 +138,15 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                     <input
                                         type={type}
                                         placeholder={placeholder}
-                                        value={profile[name] || ''} // Safety fallback
-                                        onChange={(e) => setProfile({ ...profile, [name]: e.target.value })}
-                                        className='w-full focus:outline-none text-sm text-gray-700'
+                                        value={profile[name] || ''}
+                                        onChange={(e) =>
+                                            setProfile({ ...profile, [name]: e.target.value })
+                                        }
+                                        readOnly={name === "email"}
+                                        className={`w-full focus:outline-none text-sm ${name === "email"
+                                                ? "text-gray-500 cursor-not-allowed"
+                                                : "text-gray-700"
+                                            }`}
                                         required
                                     />
                                 </div>
@@ -154,8 +155,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                 <Save className='w-4 h-4' /> Save Changes
                             </button>
                         </form>
-
-                        <div className='mt-8 pt-6 border-t border-purple-100'></div>
+                        
                     </section>
 
                     {/* Security Settings Section */}
@@ -199,7 +199,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                     <LogOut className='w-4 h-4' /> Danger Zone
                                 </h3>
                                 <button type="button" className={DANGER_BTN} onClick={onLogout}>
-                                    Logout Account
+                                    Delete Account
                                 </button>
                             </div>
                         </form>

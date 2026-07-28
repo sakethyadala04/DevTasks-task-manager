@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { verifyGoogleToken } from "../services/googleAuthService.js";
 
 import { generateVerificationToken, hashToken } from "../utils/tokenUtils.js";
+import Task from "../models/taskModel.js";
 
 import {
   sendVerificationEmail,
@@ -520,3 +521,37 @@ export const resendVerificationEmail = async (req, res) => {
     });
   }
 };
+
+export const deleteAccount = async (req, res) => {
+    try {
+        // Check if the user exists
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found.",
+            });
+        }
+
+        // Delete all tasks belonging to the user
+        await Task.deleteMany({ owner: req.userId });
+
+        // Delete the user account
+        await User.findByIdAndDelete(req.userId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Account deleted successfully.",
+        });
+
+    } catch (err) {
+        console.error("deleteAccount error:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server Error",
+        });
+    }
+};
+

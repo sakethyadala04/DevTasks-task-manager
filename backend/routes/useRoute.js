@@ -12,6 +12,7 @@ import {
     updateProfile,
     changePassword,
     resendVerificationEmail,
+    deleteAccount,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -26,6 +27,7 @@ userRouter.get("/verify-email", verifyEmail);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password', resetPassword);
 userRouter.post("/resend-verification", resendVerificationEmail);
+userRouter.delete("/delete", authMiddleware, deleteAccount);
 
 // PRIVATE LINKS protected also
 
