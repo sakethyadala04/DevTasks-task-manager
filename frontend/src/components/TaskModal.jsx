@@ -16,7 +16,7 @@ import {
 
 const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
 
-const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave }) => {
+const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave, onToggleComplete, }) => {
   const [taskData, setTaskData] = useState(DEFAULT_TASK);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

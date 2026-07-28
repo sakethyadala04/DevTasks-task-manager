@@ -54,7 +54,6 @@ const App = () => {
     localStorage.removeItem("currentUser");
     localStorage.removeItem("userId");
     setCurrentUser(null);
-    console.log("Logout clicked");
     navigate('/login', { replace: true });
   };
 
@@ -68,20 +67,36 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path='/login' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-        <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
-      </div>} />
+      <Route
+        path="/login"
+        element={
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-950 via-slate-900 to-slate-950">
+            <Login
+              onSubmit={handleAuthSubmit}
+              onSwitchMode={() => navigate("/signup")}
+            />
+          </div>
+        }
+      />
 
-      <Route path='/signup' element={<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-        <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
-      </div>} />
+      <Route
+        path="/signup"
+        element={
+          <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-zinc-950 via-slate-900 to-slate-950">
+            <SignUp
+              onSubmit={handleAuthSubmit}
+              onSwitchMode={() => navigate("/login")}
+            />
+          </div>
+        }
+      />
 
       <Route path="/verify-email" element={<VerifyEmail />} />
 
       <Route
         path="/forgot-password"
         element={
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-zinc-950 via-slate-900 to-slate-950">
             <ForgotPassword />
           </div>
         }

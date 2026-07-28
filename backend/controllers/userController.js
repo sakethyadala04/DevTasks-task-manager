@@ -343,26 +343,37 @@ export const getCurrentUser = async (req, res) => {
 // UPDATE PROFILE
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    if (!name || !email || !validator.isEmail(email)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid name and email' });
-    }
+    const { name } = req.body;
 
-    const existingUser = await User.findOne({ email, _id: { $ne: req.userId } });
-    if (existingUser) {
-      return res.status(409).json({ success: false, message: 'Email already in use by another account' });
+    if (!name || name.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required.",
+      });
     }
 
     const updated = await User.findByIdAndUpdate(
       req.userId,
-      { name, email },
-      { new: true, runValidators: true, select: 'name email' }
+      { name: name.trim() },
+      {
+        new: true,
+        runValidators: true,
+        select: "name email",
+      }
     );
 
-    return res.json({ success: true, user: updated });
+    return res.json({
+      success: true,
+      user: updated,
+    });
+
   } catch (err) {
-    console.error('updateProfile error:', err);
-    return res.status(500).json({ success: false, message: 'Server Error' });
+    console.error("updateProfile error:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
   }
 };
 
@@ -523,35 +534,35 @@ export const resendVerificationEmail = async (req, res) => {
 };
 
 export const deleteAccount = async (req, res) => {
-    try {
-        // Check if the user exists
-        const user = await User.findById(req.userId);
+  try {
+    // Check if the user exists
+    const user = await User.findById(req.userId);
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found.",
-            });
-        }
-
-        // Delete all tasks belonging to the user
-        await Task.deleteMany({ owner: req.userId });
-
-        // Delete the user account
-        await User.findByIdAndDelete(req.userId);
-
-        return res.status(200).json({
-            success: true,
-            message: "Account deleted successfully.",
-        });
-
-    } catch (err) {
-        console.error("deleteAccount error:", err);
-
-        return res.status(500).json({
-            success: false,
-            message: "Server Error",
-        });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
+
+    // Delete all tasks belonging to the user
+    await Task.deleteMany({ owner: req.userId });
+
+    // Delete the user account
+    await User.findByIdAndDelete(req.userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Account deleted successfully.",
+    });
+
+  } catch (err) {
+    console.error("deleteAccount error:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
 };
 

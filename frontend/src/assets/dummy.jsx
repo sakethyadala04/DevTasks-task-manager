@@ -77,12 +77,16 @@ export const BUTTON_CLASSES =
 export const INPUT_WRAPPER =
     "flex items-center border border-purple-100 rounded-lg px-3 py-2.5 focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-purple-500 transition-all duration-200"
 export const FULL_BUTTON =
-    "w-full bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white py-2.5 rounded-lg hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+    "w-full bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white py-2.5 rounded-lg hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2";
 export const SECTION_WRAPPER = "bg-white rounded-xl shadow-sm border border-purple-100 p-6"
 export const BACK_BUTTON =
     "flex items-center text-gray-600 hover:text-purple-600 mb-8 transition-colors duration-200"
 export const DANGER_BTN =
     "w-full text-red-600 border border-red-200 py-2.5 rounded-lg hover:bg-red-50 transition-colors duration-200"
+export const PROFILE_BUTTON =
+    "w-72 mx-auto bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white py-2.5 rounded-lg hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2";
+export const PROFILE_DANGER_BUTTON =
+    "w-60 mx-auto border border-red-300 text-red-600 py-2.5 rounded-lg hover:bg-red-50 transition-all duration-200";    
 
 export const personalFields = [
     { name: "name", type: "text", placeholder: "Full Name", icon: User },
@@ -90,18 +94,18 @@ export const personalFields = [
 ]
 
 export const securityFields = [
-    { 
-        name: "currentPassword", 
-        placeholder: "Current Password" 
+    {
+        name: "currentPassword",
+        placeholder: "Current Password"
     },
-    { 
-        name: "newPassword", 
-        placeholder: "New Password (min. 8 characters)" 
+    {
+        name: "newPassword",
+        placeholder: "New Password (min. 8 characters)"
     },
-    { 
+    {
         // Note: Check that this has three 's's to match your Profile.jsx state
-        name: "confirmpasssword", 
-        placeholder: "Confirm New Password" 
+        name: "confirmpasssword",
+        placeholder: "Confirm New Password"
     }
 ];
 
@@ -181,13 +185,16 @@ export const getPriorityBadgeColor = (priority) => {
 export const WRAPPER = "p-4 md:p-6 min-h-screen overflow-hidden"
 export const HEADER = "flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3"
 export const ADD_BUTTON =
-    "flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 w-full md:w-auto justify-center text-sm md:text-base"
+    "flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white px-5 py-3 rounded-xl shadow-md hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 w-full md:w-auto font-medium"
 export const STATS_GRID = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6"
 export const STAT_CARD =
-    "p-3 md:p-4 rounded-xl bg-white shadow-sm border border-purple-100 hover:shadow-md transition-all duration-300 min-w-0"
-export const ICON_WRAPPER = "p-1.5 md:p-2 rounded-lg"
-export const VALUE_CLASS = "text-lg md:text-2xl font-bold truncate"
-export const LABEL_CLASS = "text-xs text-gray-500 truncate"
+    "group p-4 md:p-5 rounded-2xl bg-white border border-purple-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 min-w-0"
+export const ICON_WRAPPER =
+    "p-2 md:p-3 rounded-xl transition-all duration-300 group-hover:scale-105"
+export const VALUE_CLASS =
+    "text-2xl md:text-3xl font-bold tracking-tight truncate"
+export const LABEL_CLASS =
+    "text-sm text-gray-500 mt-1 truncate"
 
 // Stats definitions
 export const STATS = [
@@ -210,13 +217,14 @@ export const FILTER_LABELS = {
 
 // Empty state
 export const EMPTY_STATE = {
-    wrapper: "p-6 bg-white rounded-xl shadow-sm border border-purple-100 text-center",
+    wrapper: "p-10 bg-white rounded-2xl shadow-sm border border-purple-100 text-center",
     iconWrapper: "w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4",
     btn: "px-4 py-2 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white rounded-lg text-sm font-medium",
 }
 
 // Filter UI Constants
-export const FILTER_WRAPPER = "flex items-center justify-between bg-white p-4 rounded-xl shadow-sm"
+export const FILTER_WRAPPER =
+    "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-purple-100"
 export const SELECT_CLASSES = "px-3 py-2 border border-purple-100 rounded-lg focus:ring-2 focus:ring-purple-500 md:hidden text-sm"
 export const TABS_WRAPPER = "hidden md:flex space-x-1 bg-purple-50 p-1 rounded-lg"
 export const TAB_BASE = "px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
@@ -299,7 +307,7 @@ export const TI_CLASSES = {
 }
 // APP.JSX
 export const user = {
-        // Fallback avatar when no user name is available
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent('User')}&background=random`
+    // Fallback avatar when no user name is available
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent('User')}&background=random`
 };
 

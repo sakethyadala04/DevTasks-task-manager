@@ -28,6 +28,7 @@ import {
 import { useOutletContext } from "react-router-dom";
 import TaskItem from "../components/TaskItem.jsx";
 import TaskModal from "../components/TaskModal.jsx";
+import TaskPreviewModal from "../components/TaskPreviewModal";
 import axios from "axios";
 
 
@@ -37,6 +38,9 @@ const Dashboard = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [filter, setFilter] = useState("all");
+
+    const [previewTask, setPreviewTask] = useState(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     /* ---------------- FILTER TASKS ---------------- */
 
@@ -120,6 +124,42 @@ const Dashboard = () => {
         [refreshTasks]
     );
 
+    const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
+
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No auth token found");
+
+        return {
+            Authorization: `Bearer ${token}`,
+        };
+    };
+
+    const handleToggleComplete = async (task) => {
+        try {
+            const newStatus = !task.completed;
+
+            await axios.put(
+                `${API_BASE}/${task._id}`,
+                {
+                    completed: newStatus,
+                },
+                {
+                    headers: getAuthHeaders(),
+                }
+            );
+
+            await refreshTasks();
+
+            setPreviewTask((prev) => ({
+                ...prev,
+                completed: newStatus,
+            }));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className={WRAPPER}>
             {/* HEADER */}
@@ -169,8 +209,8 @@ const Dashboard = () => {
                                 <div>
                                     <p
                                         className={`${VALUE_CLASS} ${gradient
-                                                ? "bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
-                                                : textColor
+                                            ? "bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
+                                            : textColor
                                             }`}
                                     >
                                         {stats[valueKey]}
@@ -247,10 +287,15 @@ const Dashboard = () => {
                                 key={task._id || task.id}
                                 task={task}
                                 onRefresh={refreshTasks}
+                                onToggleComplete={handleToggleComplete}
                                 showCompleteCheckbox
                                 onEdit={() => {
                                     setSelectedTask(task);
                                     setShowModal(true);
+                                }}
+                                onPreview={() => {
+                                    setPreviewTask(task);
+                                    setIsPreviewOpen(true);
                                 }}
                             />
                         ))
@@ -279,7 +324,21 @@ const Dashboard = () => {
                 }}
                 onSave={handleTaskSave}
             />
+
+            <TaskPreviewModal
+                isOpen={isPreviewOpen}
+                task={previewTask}
+                onClose={() => setIsPreviewOpen(false)}
+                onEdit={() => {
+                    setIsPreviewOpen(false);
+                    setSelectedTask(previewTask);
+                    setShowModal(true);
+                }}
+                onToggleComplete={() => handleToggleComplete(previewTask)}
+            />
+
         </div>
+
     );
 };
 

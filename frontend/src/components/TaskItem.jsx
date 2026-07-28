@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 import { Calendar, CheckCircle2, Clock, MoreVertical } from 'lucide-react';
 import { format, isToday } from 'date-fns';
@@ -8,7 +8,6 @@ import {
   MENU_OPTIONS,
   TI_CLASSES,
 } from '../assets/dummy';
-import TaskMoodal from './TaskModal';
 
 const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
 
@@ -19,10 +18,14 @@ const TaskItem = ({
   showCompleteCheckbox = true,
   onEdit,
   onDelete,
+  onPreview,
+  onToggleComplete,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+
   const [subtasks, setSubTasks] = useState(task.subtasks || []);
+
+  const menuRef = useRef(null);
 
   // const [isCompleted, setIsCompleted] = useState(
   //   [true, 1, 'yes'].includes(
@@ -58,29 +61,49 @@ const TaskItem = ({
     ? 'border-green-500'
     : getPriorityColor(task.priority).split(' ')[0];
 
-  const handleComplete = async () => {
-    const newStatus = !isCompleted;
+  // const handleComplete = async () => {
+  //   const newStatus = !isCompleted;
 
-    try {
-      await axios.put(
-        `${API_BASE}/${task._id}`,
-        { completed: newStatus },
-        { headers: getAuthHeaders() }
-      );
+  //   try {
+  //     await axios.put(
+  //       `${API_BASE}/${task._id}`,
+  //       { completed: newStatus },
+  //       { headers: getAuthHeaders() }
+  //     );
 
-      setIsCompleted(newStatus);
+  //     setIsCompleted(newStatus);
 
-      onRefresh?.();
-    } catch (err) {
-      if (err.response?.status === 401) onLogout?.();
-    }
-  };
+  //     onRefresh?.();
+  //   } catch (err) {
+  //     if (err.response?.status === 401) onLogout?.();
+  //   }
+  // };
 
   const handleAction = (action) => {
     setShowMenu(false);
-    if (action === 'edit') setShowEditModal(true);
-    if (action === 'delete') handleDelete();
+
+    if (action === "edit") {
+      onEdit?.();
+    }
+
+    if (action === "delete") {
+      handleDelete();
+    }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleDelete = async () => {
     try {
@@ -93,88 +116,106 @@ const TaskItem = ({
     }
   };
 
-  const handleSave = async (updatedTask) => {
-    try {
-      const payload = (({ title, description, priority, duedate, completed }) =>
-        ({ title, description, priority, duedate, completed }))(updatedTask)
-      await axios.put(`${API_BASE}/${task._id}`, payload, {
-        headers: getAuthHeaders(),
-      })
-      setShowEditModal(false);
-      onRefresh?.();
-    } catch (err) {
-      if (err.response?.status === 401) onLogout?.();
-    }
-  };
-
-  const progress = subtasks.length ? (subtasks.filter(st => st.completed).length / subtasks.length) * 100 : 0;
-
-  const dueDate = task.duedate ? new Date(task.duedate) : null;
-
   return (
     <>
-      <div className={`${TI_CLASSES.wrapper} ${borderColor}`}>
-        <div className={TI_CLASSES.leftContainer}>
-          {showCompleteCheckbox && (
-            <button
-              onClick={handleComplete}
-              className={`
-    ${TI_CLASSES.completeBtn}
-    transition-colors duration-200
-    ${isCompleted
-                  ? '!text-green-500 hover:!text-green-500'
-                  : 'text-gray-300 hover:text-purple-500'
-                }
-  `}
-            >
-              <CheckCircle2
-                size={18}
-                className={TI_CLASSES.checkboxIconBase}
-              />
-            </button>
-          )}
+      <div
+        onClick={() => {
+          setShowMenu(false);
+          onPreview?.();
+        }}
+        className={`${TI_CLASSES.wrapper} ${borderColor} cursor-pointer p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
+      >
+        {/* Row 1 */}
+        <div className="flex items-start justify-between gap-4">
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-              <h3
-                className={`${TI_CLASSES.titleBase} ${isCompleted
-                  ? 'text-gray-400 line-through'
-                  : 'text-gray-800'
-                  }`}
+          <div className="flex flex-1 gap-4 min-w-0">
+
+            {showCompleteCheckbox && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleComplete(task);
+                }}
+                className={`
+            mt-1
+            ${TI_CLASSES.completeBtn}
+            transition-colors duration-200
+            ${isCompleted
+                    ? "!text-green-500 hover:!text-green-500"
+                    : "text-gray-300 hover:text-purple-500"
+                  }
+          `}
               >
-                {task.title}
-              </h3>
-
-              <span
-                className={`${TI_CLASSES.priorityBadge} ${getPriorityBadgeColor(
-                  task.priority
-                )}`}
-              >
-                {task.priority || 'No Priority'}
-              </span>
-            </div>
-
-            {task.description && (
-              <p className={TI_CLASSES.description}>{task.description}</p>
+                <CheckCircle2
+                  size={20}
+                  className={TI_CLASSES.checkboxIconBase}
+                />
+              </button>
             )}
-          </div>
-        </div>
 
-        <div className={TI_CLASSES.rightContainer}>
-          <div className="relative">
+            <div className="flex-1 min-w-0">
+
+              {/* Title + Priority */}
+              <div className="flex items-center gap-3 flex-wrap">
+
+                <h3
+                  className={`text-xl font-bold ${isCompleted
+                    ? "line-through text-gray-400"
+                    : "text-gray-900"
+                    }`}
+                >
+                  {task.title}
+                </h3>
+
+                <span
+                  className={`${getPriorityBadgeColor(
+                    task.priority
+                  )} px-3 py-1 rounded-full text-xs font-semibold`}
+                >
+                  {task.priority}
+                </span>
+
+              </div>
+
+              {/* Description */}
+              {task.description && (
+                <p className="mt-3 text-gray-600 text-sm leading-6 line-clamp-2">
+                  {task.description}
+                </p>
+              )}
+
+            </div>
+          </div>
+
+          {/* Menu */}
+          <div className="relative" ref={menuRef}>
+
             <button
-              onClick={() => setShowMenu(!showMenu)}
-              className={TI_CLASSES.menuButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(prev => !prev);
+              }}
+              className="p-2 rounded-lg hover:bg-purple-50 transition"
             >
               <MoreVertical className="w-5 h-5 text-gray-500" />
             </button>
 
             {showMenu && (
-              <div className={TI_CLASSES.menuDropdown}>
+              <div
+                className={`${TI_CLASSES.menuDropdown}
+                           origin-top-right
+                           animate-in
+                           fade-in
+                           zoom-in-95
+                           duration-10000000`}
+              >
                 {MENU_OPTIONS.map((opt) => (
                   <button
                     key={opt.action}
-                    onClick={() => handleAction(opt.action)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAction(opt.action);
+                    }}
                     className="w-full px-3 py-2 text-left text-sm hover:bg-purple-50 flex items-center gap-2"
                   >
                     {opt.icon}
@@ -183,36 +224,48 @@ const TaskItem = ({
                 ))}
               </div>
             )}
+
           </div>
 
-          <div>
+        </div>
+
+        {/* Row 2 */}
+        <div className="flex items-center justify-between mt-5 text-sm">
+
+          <div className="flex items-center gap-6 flex-wrap">
+
             <div
-              className={`${TI_CLASSES.dateRow} ${task.duedate && isToday(new Date(task.duedate))
-                ? 'text-purple-500'
-                : 'text-gray-500'
+              className={`flex items-center gap-2 ${task.duedate && isToday(new Date(task.duedate))
+                ? "text-purple-600 font-medium"
+                : "text-gray-500"
                 }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
+              <Calendar size={16} />
+
               {task.duedate
                 ? isToday(new Date(task.duedate))
-                  ? 'Today'
-                  : format(new Date(task.duedate), 'MMM dd')
-                : '-'}
+                  ? "Today"
+                  : format(new Date(task.duedate), "MMM dd")
+                : "No Due Date"}
             </div>
 
-            <div className={TI_CLASSES.createdRow}>
-              <Clock className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 text-gray-500">
+              <Clock size={16} />
+
               {task.createdAt
-                ? `Created ${format(new Date(task.createdAt), 'MMM dd')}`
-                : 'No date'}
+                ? format(new Date(task.createdAt), "MMM dd")
+                : "-"}
             </div>
+
           </div>
+
+          <div className="text-purple-600 font-medium text-sm">
+            View →
+          </div>
+
         </div>
       </div>
-      <TaskMoodal isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        taskToEdit={task}
-        onSave={handleSave} />
+
     </>
   );
 };

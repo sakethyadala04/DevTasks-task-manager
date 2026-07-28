@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { UserCircle, Save, Shield, Lock, LogOut, Eye, EyeOff } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, SECTION_WRAPPER, securityFields } from '../assets/dummy.jsx';
+import { DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, PROFILE_BUTTON, SECTION_WRAPPER, securityFields } from '../assets/dummy.jsx';
 
 import axios from 'axios';
 
@@ -16,6 +16,9 @@ const Profile = ({ setCurrentUser, onLogout }) => {
         newPassword: '',
         confirmpasssword: ''
     });
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     // 2. Individual Visibility State (Using an object for independent toggles)
     const [showPasswords, setShowPasswords] = useState({});
@@ -106,6 +109,48 @@ const Profile = ({ setCurrentUser, onLogout }) => {
         }
     };
 
+    // Delete Account
+    const deleteAccount = async () => {
+        try {
+            setDeleting(true);
+
+            const token = localStorage.getItem("token");
+
+            const { data } = await axios.delete(
+                `${API_URL}/api/user/delete`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (data.success) {
+                toast.success(data.message);
+
+                setShowDeleteModal(false);
+
+                localStorage.removeItem("token");
+                setCurrentUser(null);
+
+                setTimeout(() => {
+                    navigate("/login", { replace: true });
+                }, 1500);
+            } else {
+                toast.error(data.message);
+            }
+
+        } catch (err) {
+            toast.error(
+                err.response?.data?.message || "Failed to delete account."
+            );
+        }
+
+        finally {
+            setDeleting(false);
+        }
+    };
+
     return (
         <div className='min-h-screen bg-gray-50'>
             <ToastContainer position='top-center' autoClose={3000} />
@@ -144,18 +189,18 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                         }
                                         readOnly={name === "email"}
                                         className={`w-full focus:outline-none text-sm ${name === "email"
-                                                ? "text-gray-500 cursor-not-allowed"
-                                                : "text-gray-700"
+                                            ? "text-gray-500 cursor-not-allowed"
+                                            : "text-gray-700"
                                             }`}
                                         required
                                     />
                                 </div>
                             ))}
-                            <button className={FULL_BUTTON} type="submit">
+                            <button className={PROFILE_BUTTON} type="submit">   
                                 <Save className='w-4 h-4' /> Save Changes
                             </button>
                         </form>
-                        
+
                     </section>
 
                     {/* Security Settings Section */}
@@ -189,16 +234,26 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                     </button>
                                 </div>
                             ))}
-                            <button className={FULL_BUTTON} type="submit">
+                            <button className={PROFILE_BUTTON} type="submit">
                                 <Shield className='w-4 h-4' /> Change Password
                             </button>
 
-                            {/* Danger Zone Section */}
-                            <div className='mt-8 pt-6 border-t border-purple-100'>
-                                <h3 className='text-red-600 font-semibold mb-4 flex items-center gap-2'>
-                                    <LogOut className='w-4 h-4' /> Danger Zone
+                            {/* Danger Zone */}
+                            <div className="mt-8 pt-6 border-t border-purple-100">
+                                <h3 className="text-red-600 font-semibold mb-2 flex items-center gap-2">
+                                    <LogOut className="w-4 h-4" />
+                                    Danger Zone
                                 </h3>
-                                <button type="button" className={DANGER_BTN} onClick={onLogout}>
+
+                                <p className="text-sm text-gray-500 mb-4">
+                                    Deleting your account is permanent. All your tasks and account data will be permanently deleted.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    className={DANGER_BTN} 
+                                    onClick={() => setShowDeleteModal(true)}
+                                >
                                     Delete Account
                                 </button>
                             </div>
@@ -206,6 +261,43 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                     </section>
                 </div>
             </div>
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+
+                        <h2 className="text-xl font-bold text-red-600 mb-3">
+                            Delete Account
+                        </h2>
+
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete your account?
+                            <br />
+                            <br />
+                            Your account and all associated tasks will be permanently deleted.
+                        </p>
+
+                        <div className="flex justify-end gap-3">
+
+                            <button
+                                className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+                                onClick={() => setShowDeleteModal(false)}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                                onClick={deleteAccount}
+                                disabled={deleting}
+                            >
+                                {deleting ? "Deleting..." : "Delete"}
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

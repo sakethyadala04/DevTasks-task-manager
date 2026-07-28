@@ -37,27 +37,39 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="max-w-md w-full bg-white shadow-lg rounded-xl p-8 border border-purple-100">
+        <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10">
 
-            <h2 className="text-2xl font-bold text-center mb-2">
-                Forgot Password
-            </h2>
+            {/* Header */}
+            <div className="flex items-center gap-5 pb-1 ">
 
-            <p className="text-center text-gray-500 mb-6">
-                Enter your email and we'll send you a password reset link.
-            </p>
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                    <Mail className="h-8 w-8 text-white" />
+                </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-900">
+                        Forgot Password
+                    </h2>
+
+                    <p className="mt-1 text-gray-500">
+                        Enter your email and we'll send you a reset link.
+                    </p>
+                </div>
+
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="mt-8 space-y-7">
 
                 <div className={INPUTWRAPPER}>
-                    <Mail className="w-5 h-5 text-purple-500 mr-2" />
+                    <Mail className="w-5 h-5 text-purple-500 mr-4" />
 
                     <input
                         type="email"
-                        placeholder="Enter your email"
-                        className="w-full focus:outline-none"
+                        placeholder="Enter your email address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-transparent text-gray-700 focus:outline-none"
                         required
                     />
                 </div>
@@ -67,18 +79,30 @@ const ForgotPassword = () => {
                     className={BUTTON_CLASSES}
                     disabled={loading}
                 >
-                    {loading ? "Sending..." : "Send Reset Link"}
+                    {loading ? (
+                        "Sending..."
+                    ) : (
+                        <div className="flex items-center justify-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            Send Reset Link
+                        </div>
+                    )}
                 </button>
 
             </form>
 
-            <Link
-                to="/login"
-                className="flex items-center justify-center gap-2 mt-6 text-purple-600 hover:underline"
-            >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Login
-            </Link>
+            {/* Footer */}
+            <div className="mt-6 pt-1 flex justify-center">
+
+                <Link
+                    to="/login"
+                    className="flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700 transition"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Login
+                </Link>
+
+            </div>
 
         </div>
     );

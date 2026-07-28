@@ -126,27 +126,39 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     ];
 
     return (
-        <div className="max-w-md bg-white w-full shadow-lg border border-purple-100 rounded-xl p-8">
-            <div className="mb-6 text-center">
-                
-                <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center mb-4">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-purple-100 shadow-2xl p-8">
+
+            <div className="mb-8 text-center">
+
+                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-300/50">
                     <LogIn className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
-                <p className="text-gray-600 mt-2">Login to your account</p>
+
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                    Welcome Back
+                </h2>
+
+                <p className="mt-2 text-gray-500">
+                    Sign in to continue to{" "}
+                    <span className="font-semibold text-purple-600">
+                        DevTasks
+                    </span>
+                </p>
+
             </div>
 
-            {/* ✅ Added Visual Error Box */}
             {loginError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center animate-pulse">
+                <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-600">
                     {loginError}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+
                 {fields.map(({ name, type, placeholder, icon: Icon, isPassword }) => (
                     <div key={name} className={INPUTWRAPPER}>
                         <Icon className="w-5 h-5 text-purple-500 mr-2" />
+
                         <input
                             type={isPassword && showPassword ? "text" : type}
                             autoComplete={
@@ -156,17 +168,27 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                             }
                             placeholder={placeholder}
                             value={form[name]}
-                            onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-                            className="w-full focus:outline-none text-sm text-gray-700"
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    [name]: e.target.value,
+                                })
+                            }
+                            className="w-full bg-transparent text-sm text-gray-700 focus:outline-none"
                             required
                         />
+
                         {isPassword && (
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
-                                className="ml-2 text-gray-500 hover:text-purple-500 transition-colors"
+                                className="ml-2 text-gray-500 hover:text-purple-500 transition"
                             >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
                             </button>
                         )}
                     </div>
@@ -174,13 +196,19 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
                 <Link
                     to="/forgot-password"
-                    className="block ml-2 text-sm text-purple-600 hover:text-purple-700 hover:underline"
+                    className="block text-sm font-medium text-purple-600 hover:text-purple-700 hover:underline"
                 >
                     Forgot Password?
                 </Link>
 
-                <button type="submit" className={BUTTON_CLASSES} disabled={loading}>
-                    {loading ? "Logging in..." : (
+                <button
+                    type="submit"
+                    className={BUTTON_CLASSES}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        "Logging in..."
+                    ) : (
                         <div className="flex items-center justify-center gap-2">
                             <LogIn className="w-4 h-4" />
                             Login
@@ -188,33 +216,32 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                     )}
                 </button>
 
-                <div className="my-4 flex items-center">
-                    <div className="flex-1 border-t border-gray-300"></div>
-                    <span className="px-3 text-sm text-gray-500">OR</span>
-                    <div className="flex-1 border-t border-gray-300"></div>
+                <div className="flex items-center my-5">
+                    <div className="flex-1 border-t border-gray-200" />
+                    <span className="px-4 text-sm text-gray-400">OR</span>
+                    <div className="flex-1 border-t border-gray-200" />
                 </div>
 
                 <div className="flex justify-center">
                     <GoogleLogin
                         onSuccess={handleGoogleLogin}
-                        onError={() => {
-                            toast.error("Google Login Failed");
-                        }}
+                        onError={() => toast.error("Google Login Failed")}
                     />
                 </div>
 
             </form>
 
-            <p className="text-center text-sm text-gray-600 mt-6">
+            <p className="mt-6 text-center text-sm text-gray-600">
                 Don't have an account?{" "}
                 <button
                     type="button"
                     onClick={onSwitchMode}
-                    className="text-purple-600 hover:text-purple-700 hover:underline font-medium transition-colors"
+                    className="font-semibold text-purple-600 hover:text-purple-700 hover:underline transition"
                 >
                     Sign up
                 </button>
             </p>
+
         </div>
     );
 };
