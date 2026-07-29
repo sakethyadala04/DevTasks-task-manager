@@ -409,6 +409,7 @@ export const changePassword = async (req, res) => {
 // Google Login
 
 export const googleLogin = async (req, res) => {
+  console.log("Google login route hit");
   try {
     const { credential } = req.body;
 

@@ -1,23 +1,12 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async ({ email, name, token }) => {
-    console.log("STEP 1: Entered sendVerificationEmail");
-
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-    const mailOptions = {
-        from: `"DevTasks" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await resend.emails.send({
+        from: "onboarding@resend.dev",
         to: email,
         subject: "Verify Your DevTasks Account",
         html: `
@@ -43,85 +32,40 @@ export const sendVerificationEmail = async ({ email, name, token }) => {
                 If you did not create this account, you can safely ignore this email.
             </p>
         `,
-    };
+    });
 
-    console.log("STEP 2: Mail options created");
-
-    try {
-        console.log("STEP 3: About to call transporter.sendMail()");
-
-        const info = await transporter.sendMail(mailOptions);
-
-        console.log("STEP 4: sendMail finished successfully");
-        console.log(info.response);
-    } catch (error) {
-        console.log("STEP 5: sendMail threw an error");
+    if (error) {
         console.error(error);
         throw error;
     }
+
+    console.log("Verification email sent:", data);
 };
 
 export const sendPasswordResetEmail = async (email, token) => {
-    try {
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-        await transporter.sendMail({
-            from: `"DevTasks" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Reset Your DevTasks Password",
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-                    <h2 style="color:#2563eb;">
-                     🔐 Reset Your DevTasks Password
-                    </h2>
+    const { data, error } = await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Reset Your DevTasks Password",
+        html: `
+            <h2>Reset Your Password</h2>
 
-                    <p>
-                       Hello,
-                    </p>
+            <p>Click the link below to reset your password:</p>
 
-                    <p>
-                       We received a request to reset the password for your DevTasks account.
-                    </p>
+            <a href="${resetUrl}">
+                Reset Password
+            </a>
 
-                    <p>Click the button below to create a new password:</p>
+            <p>This link expires in 24 hours.</p>
+        `,
+    });
 
-                    <a
-                        href="${resetUrl}"
-                        style="
-                            font-size:16px;
-                            display:inline-block;
-                            padding:14px 28px;
-                            background:#2563eb;
-                            color:#fff;
-                            text-decoration:none;
-                            border-radius:8px;
-                            font-weight:bold;
-                            box-shadow:0 4px 10px rgba(37,99,235,.25);
-                        "
-                    >
-                        Reset Password
-                    </a>
-
-                    <p
-                     style="
-                         margin-top:20px;
-                         color:#d97706;
-                         font-weight:bold;
-                        "
-                    >
-                         ⚠ This link expires in 24 hours.
-                    </p>
-
-                    <p>
-                        If you didn't request a password reset, you can safely ignore this email.
-                    </p>
-                </div>
-            `,
-        });
-
-        console.log("Password reset email sent.");
-    } catch (error) {
-        console.error("Password reset email failed:", error);
+    if (error) {
+        console.error(error);
         throw error;
     }
+
+    console.log("Password reset email sent:", data);
 };
