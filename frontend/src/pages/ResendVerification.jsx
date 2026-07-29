@@ -31,7 +31,9 @@ const ResendVerification = () => {
                 { email }
             );
 
-            toast.success(data.message);
+            toast.success(
+                "Password reset link sent! Please check your inbox (or Spam folder if needed)."
+            );
 
             setTimeout(() => {
                 navigate("/login");

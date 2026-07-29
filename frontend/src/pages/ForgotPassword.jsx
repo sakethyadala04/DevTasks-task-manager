@@ -14,6 +14,18 @@ const ForgotPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!email.trim()) {
+            toast.error("Email is required.");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            toast.error("Please enter a valid email address.");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -22,7 +34,9 @@ const ForgotPassword = () => {
                 { email }
             );
 
-            toast.success(data.message);
+            toast.success(
+                "Password reset link sent! Please check your email inbox."
+            );
 
             setEmail("");
 

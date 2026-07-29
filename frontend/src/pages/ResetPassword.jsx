@@ -32,6 +32,16 @@ const ResetPassword = () => {
             return;
         }
 
+        if (!form.password.trim()) {
+            toast.error("Please enter a new password.");
+            return;
+        }
+
+        if (!form.confirmPassword.trim()) {
+            toast.error("Please confirm your password.");
+            return;
+        }
+
         if (form.password.length < 8) {
             toast.error("Password must be at least 8 characters long.");
             return;
@@ -53,11 +63,11 @@ const ResetPassword = () => {
                 }
             );
 
-            toast.success(data.message);
+            toast.success("Password reset successfully! Redirecting to login...");
 
             setTimeout(() => {
                 navigate("/login");
-            }, 2000);
+            }, 1500);
 
         } catch (err) {
             toast.error(
