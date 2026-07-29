@@ -12,6 +12,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendVerificationEmail = async ({ email, name, token }) => {
+    console.log("STEP 1: Entered sendVerificationEmail");
+
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
     const mailOptions = {
@@ -43,11 +45,17 @@ export const sendVerificationEmail = async ({ email, name, token }) => {
         `,
     };
 
+    console.log("STEP 2: Mail options created");
+
     try {
+        console.log("STEP 3: About to call transporter.sendMail()");
+
         const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent successfully:", info.response);
+
+        console.log("STEP 4: sendMail finished successfully");
+        console.log(info.response);
     } catch (error) {
-        console.error("Email send failed:");
+        console.log("STEP 5: sendMail threw an error");
         console.error(error);
         throw error;
     }

@@ -83,6 +83,7 @@ export const registerUser = async (req, res) => {
       name: newUser.name,
       token: verificationToken,
     });
+    console.log("STEP 6: Back inside registerUser()");
 
     return res.status(201).json({
       success: true,
