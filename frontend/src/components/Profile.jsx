@@ -6,7 +6,9 @@ import { DANGER_BTN, FULL_BUTTON, INPUTWRAPPER, personalFields, PROFILE_BUTTON, 
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = (
+    import.meta.env.VITE_API_URL ?? "http://localhost:5000"
+).replace(/\/+$/, "");
 
 const Profile = ({ setCurrentUser, onLogout }) => {
     // 1. Core State
@@ -196,7 +198,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
                                     />
                                 </div>
                             ))}
-                            <button className={PROFILE_BUTTON} type="submit">   
+                            <button className={PROFILE_BUTTON} type="submit">
                                 <Save className='w-4 h-4' /> Save Changes
                             </button>
                         </form>
@@ -251,7 +253,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
 
                                 <button
                                     type="button"
-                                    className={DANGER_BTN} 
+                                    className={DANGER_BTN}
                                     onClick={() => setShowDeleteModal(true)}
                                 >
                                     Delete Account
