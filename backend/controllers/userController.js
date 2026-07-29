@@ -498,6 +498,12 @@ export const resendVerificationEmail = async (req, res) => {
 
     const user = await User.findOne({ email });
 
+    const users = await User.find();
+
+    console.log("Email received:", email);
+    console.log("User found:", user);
+    console.log("All users:", users.map(u => u.email));
+
     if (!user) {
       return res.status(404).json({
         message: "User not found.",
