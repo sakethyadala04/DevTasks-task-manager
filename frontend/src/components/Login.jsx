@@ -90,10 +90,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
         try {
             const { data } = await axios.post(
-                `${API_URL}/api/user/login`,
+                `${API_URL}/api/user/google`,
                 {
-                    email: form.email,
-                    password: form.password,
+                    credential: credentialResponse.credential,
                 },
                 {
                     timeout: 10000,

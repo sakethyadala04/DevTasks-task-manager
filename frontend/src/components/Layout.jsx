@@ -16,24 +16,41 @@ const Layout = ({ onLogout, user }) => {
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
+
             if (!token) {
-                throw new Error('No authentication token found');
+                throw new Error("No authentication token found");
             }
 
             const API_URL = (
                 import.meta.env.VITE_API_URL ?? "http://localhost:5000"
             ).replace(/\/+$/, "");
 
-            const array = Array.isArray(data) ? data :
-                Array.isArray(data?.tasks) ? data.tasks :
-                    Array.isArray(data?.data) ? data.data : [];
+            const { data } = await axios.get(
+                `${API_URL}/api/tasks`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const array = Array.isArray(data)
+                ? data
+                : Array.isArray(data?.tasks)
+                    ? data.tasks
+                    : Array.isArray(data?.data)
+                        ? data.data
+                        : [];
+
             setTasks(array);
+
         } catch (error) {
             console.error("Failed to fetch tasks:", error);
             setError(error.message || "Could not load tasks.");
-            if (error.response && error.response.status === 401) {
-                onLogout();
+
+            if (error.response?.status === 401) {
+                onLogout?.();
             }
         } finally {
             setLoading(false);

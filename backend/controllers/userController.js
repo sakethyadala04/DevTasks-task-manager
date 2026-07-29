@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { verifyGoogleToken } from "../services/googleAuthService.js";
-import validator from "validator";
 
 import { generateVerificationToken, hashToken } from "../utils/tokenUtils.js";
 import Task from "../models/taskModel.js";
