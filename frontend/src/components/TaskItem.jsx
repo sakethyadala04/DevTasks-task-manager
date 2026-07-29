@@ -9,7 +9,8 @@ import {
   TI_CLASSES,
 } from '../assets/dummy';
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
+const API_BASE = `${(import.meta.env.VITE_API_URL ?? "http://localhost:5000").replace(/\/+$/, "")
+  }/api/tasks`;
 
 const TaskItem = ({
   task,
@@ -23,33 +24,14 @@ const TaskItem = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
-  const [subtasks, setSubTasks] = useState(task.subtasks || []);
-
   const menuRef = useRef(null);
 
-  // const [isCompleted, setIsCompleted] = useState(
-  //   [true, 1, 'yes'].includes(
-  //     typeof task.isCompleted === 'string'
-  //       ? task.isCompleted.toLowerCase()
-  //       : task.isCompleted
-  //   )
-  // );
 
   const [isCompleted, setIsCompleted] = useState(Boolean(task.completed));
 
   useEffect(() => {
     setIsCompleted(Boolean(task.completed));
   }, [task.completed]);
-
-  // useEffect(() => {
-  //   setIsCompleted(
-  //     [true, 1, 'yes'].includes(
-  //       typeof task.isCompleted === 'string'
-  //         ? task.isCompleted.toLowerCase()
-  //         : task.isCompleted
-  //     )
-  //   );
-  // }, [task.isCompleted]);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -60,24 +42,6 @@ const TaskItem = ({
   const borderColor = isCompleted
     ? 'border-green-500'
     : getPriorityColor(task.priority).split(' ')[0];
-
-  // const handleComplete = async () => {
-  //   const newStatus = !isCompleted;
-
-  //   try {
-  //     await axios.put(
-  //       `${API_BASE}/${task._id}`,
-  //       { completed: newStatus },
-  //       { headers: getAuthHeaders() }
-  //     );
-
-  //     setIsCompleted(newStatus);
-
-  //     onRefresh?.();
-  //   } catch (err) {
-  //     if (err.response?.status === 401) onLogout?.();
-  //   }
-  // };
 
   const handleAction = (action) => {
     setShowMenu(false);
@@ -207,7 +171,7 @@ const TaskItem = ({
                            animate-in
                            fade-in
                            zoom-in-95
-                           duration-10000000`}
+                           duration-100`}
               >
                 {MENU_OPTIONS.map((opt) => (
                   <button

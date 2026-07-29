@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserCircle, Save, Shield, Lock, LogOut, Eye, EyeOff } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +19,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
         newPassword: '',
         confirmpasssword: ''
     });
+    const navigate = useNavigate();
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -70,14 +72,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
     // Change Password Logic
     const changePassword = async (e) => {
         e.preventDefault();
-
-        // 1. Debugging: Check exactly what is being sent
-        console.log("Sending to backend:", {
-            current: passwords.currentPassword,
-            new: passwords.newPassword,
-            confirm: passwords.confirmpasssword
-        });
-
+        
         // 2. Local Validation
         if (!passwords.newPassword || passwords.newPassword.length < 8) {
             return toast.error("New password must be at least 8 characters.");

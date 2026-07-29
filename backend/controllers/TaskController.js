@@ -2,7 +2,7 @@
 
 import Task from '../models/taskModel.js';
 
-// craete a new task
+// create a new task
 export const createTask = async (req, res) => {
     try {
         const { title, description, priority, duedate, completed } = req.body;
@@ -11,11 +11,14 @@ export const createTask = async (req, res) => {
             description,
             priority,
             duedate,
-            completed: completed === 'Yes' || completed === true,
+            completed: Boolean(completed),
             owner: req.user.id
         });
         const saved = await task.save();
-        res.status(201).json({ message: 'Task created successfully', task: saved });
+        return res.status(201).json({
+             message: 'Task created successfully',
+              task: saved 
+            });
     }
     catch (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -30,7 +33,10 @@ export const getTasks = async (req, res) => {
         res.json({ success: true, tasks });
 
     } catch (err) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
     }
 }
 
@@ -40,7 +46,7 @@ export const getTaskById = async (req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, owner: req.user.id })
         if (!task)
-            return res.status(404).json({ succcess: false, message: "Task not found" });
+            return res.status(404).json({ success: false, message: "Task not found" });
 
         res.json({ success: true, task });
 
@@ -65,11 +71,18 @@ export const updateTask = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        if (!updated) res.status(404).json({
-            success: false, message: 'Task not found or not yours'
+        if (!updated) {
+            return res.status(404).json({
+                success: false,
+                message: "Task not found or not yours",
+            });
+        }
+
+        return res.json({
+            success: true,
+            task: updated,
         });
-        
-        res.json({ success: true, task: updated });
+
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }
@@ -86,10 +99,10 @@ export const deleteTask = async (req, res) => {
         })
 
         if (!deleted) {
-            return res.status(404).json({ success: false, message: "Task not fround or not yours" });
+            return res.status(404).json({ success: false, message: "Task not found or not yours" });
         }
-        res.json({ success: true, message: "task deleted successfully" });
+        res.json({ success: true, message: "Task deleted successfully" });
     } catch (err) {
-        res.status(500).json({ successe: false, message: err.message });
+        res.status(500).json({ success: false, message: err.message });
     }
 }

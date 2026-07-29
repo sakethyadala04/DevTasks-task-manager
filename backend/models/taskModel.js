@@ -3,31 +3,40 @@
 import mongoose from 'mongoose';
 
 const TaskSchema = new mongoose.Schema({
-    title : {
+    title: {
         type: String,
         required: true,
+        trim: true,
     },
-    description :{
+
+    description: {
         type: String,
-        default: ''
+        default: '',
+        trim: true,
     },
+
     priority: {
         type: String,
         enum: ['Low', 'Medium', 'High'], default: 'Low'
     },
+
     duedate: {
         type: Date,
         required: true
     },
-    owner:{
-        type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true
+
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    completed:{
+
+    completed: {
         type: Boolean,
         default: false
     }
-},    
-    {timestamps: true} 
+},
+    { timestamps: true }
 );
 
 const Task = mongoose.models.task || mongoose.model('task', TaskSchema);

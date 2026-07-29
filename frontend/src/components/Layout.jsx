@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Navbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx"
 import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { Zap, Circle, Clock, TrendingUp } from "lucide-react";
 
-const Layout = ({ onLogout, user, children }) => {
+const Layout = ({ onLogout, user }) => {
 
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,22 +21,17 @@ const Layout = ({ onLogout, user, children }) => {
                 throw new Error('No authentication token found');
             }
 
-            const { data } = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/tasks`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            const API_URL = (
+                import.meta.env.VITE_API_URL ?? "http://localhost:5000"
+            ).replace(/\/+$/, "");
 
             const array = Array.isArray(data) ? data :
                 Array.isArray(data?.tasks) ? data.tasks :
                     Array.isArray(data?.data) ? data.data : [];
             setTasks(array);
         } catch (error) {
-            console.error(error);
-            setError(error.message || "could not load task");
+            console.error("Failed to fetch tasks:", error);
+            setError(error.message || "Could not load tasks.");
             if (error.response && error.response.status === 401) {
                 onLogout();
             }
@@ -99,7 +94,7 @@ const Layout = ({ onLogout, user, children }) => {
                 <div className=' bg-red-50 text-red-600 p-4 rounded-xl border-red-100 max-w-md  '>
                     <p className=' font-medium mb-2 '> Error loading task</p>
                     <p className='text-sm'> {error} </p>
-                    <button onClick={fetchTasks} className=' mt-4 py-2 px-4 bg-red text-red-700 rounded-lg
+                    <button onClick={fetchTasks} className=' mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg
                   text-sm font-md hover:bg-red-200 transition-colors '>
                         Try Again
                     </button>
@@ -111,7 +106,7 @@ const Layout = ({ onLogout, user, children }) => {
 
         <div className=' min-h-screen bg-gray-50 '>
             <Navbar user={user} onLogout={onLogout} />
-            <Sidebar user={user} task={tasks} />
+            <Sidebar user={user} tasks={tasks} />
 
             <div className=' ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300' >
                 <div className=' grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 '>
@@ -195,8 +190,8 @@ const Layout = ({ onLogout, user, children }) => {
                                         <p className=' text-sm text-gray-500 '>
                                             No recent activity
                                         </p>
-                                        <p className=' text-xm text-gray-400 mt-4 '>
-                                            task will apper here
+                                        <p className=' text-xs text-gray-400 mt-4 '>
+                                            Tasks will apper here.
                                         </p>
                                     </div>
                                 )}

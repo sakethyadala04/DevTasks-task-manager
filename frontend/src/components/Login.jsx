@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock, LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
@@ -49,10 +49,16 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
         setLoading(true);
         try {
-            const { data } = await axios.post(`${API_URL}/api/user/login`, {
-                email: form.email,
-                password: form.password,
-            });
+            const { data } = await await axios.post(
+                `${API_URL}/api/user/login`,
+                {
+                    email: form.email,
+                    password: form.password,
+                },
+                {
+                    timeout: 10000,
+                }
+            );
 
             // If backend sends a failure status or missing data
             if (!data?.token || !data?.user) {
@@ -65,12 +71,12 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             setForm(INITIAL_FORM);
             onSubmit?.({ user: data.user, token: data.token });
 
-            toast.success("Login successful! Redirecting...");
-            setTimeout(() => navigate("/"), 1500);
+            toast.success("Login successful!");
+            navigate("/");
 
         } catch (err) {
             // ✅ Correctly capture and display the error message
-            const errorMessage = err.response?.data?.message || err.message || "Login failed. Please try again.";
+            const errorMessage = err.response?.data?.message || err.message || "Unable to sign in. Please try again.";
             setLoginError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -84,9 +90,13 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
         try {
             const { data } = await axios.post(
-                `${API_URL}/api/user/google`,
+                `${API_URL}/api/user/login`,
                 {
-                    credential: credentialResponse.credential,
+                    email: form.email,
+                    password: form.password,
+                },
+                {
+                    timeout: 10000,
                 }
             );
 
@@ -102,7 +112,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                 token: data.token,
             });
 
-            toast.success("Google login successful!");
+            toast.success("Welcome! Google login successful.");
 
             navigate("/");
 
@@ -225,7 +235,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
                 <div className="flex justify-center">
                     <GoogleLogin
                         onSuccess={handleGoogleLogin}
-                        onError={() => toast.error("Google Login Failed")}
+                        oonError={() =>
+                            toast.error("Google sign-in was cancelled or failed.")
+                        }
                     />
                 </div>
 

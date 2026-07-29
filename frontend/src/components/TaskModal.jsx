@@ -14,9 +14,10 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
+const API_BASE = `${(import.meta.env.VITE_API_URL ?? "http://localhost:5000").replace(/\/+$/, "")
+  }/api/tasks`;
 
-const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave, onToggleComplete, }) => {
+const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave, }) => {
   const [taskData, setTaskData] = useState(DEFAULT_TASK);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -100,7 +101,7 @@ const TaskModal = ({ isOpen, taskToEdit, onClose, onLogout, onSave, onToggleComp
         onSave?.(saved);
         onClose();
       } catch (err) {
-        console.error(err);
+        console.error("Failed to save task:", err);
         setError(err.message || 'An error occurred while saving the task.');
       } finally {
         setLoading(false);

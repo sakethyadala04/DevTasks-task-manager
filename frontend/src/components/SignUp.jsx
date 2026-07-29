@@ -7,7 +7,10 @@ import axios from "axios";
 
 
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (
+    import.meta.env.VITE_API_URL ?? "http://localhost:5000"
+).replace(/\/+$/, "");
+
 const INITIAL_FORM = { name: '', email: '', password: '' };
 
 const SignUp = ({ onSwitchMode }) => {
@@ -24,8 +27,8 @@ const SignUp = ({ onSwitchMode }) => {
         setMessage({ text: "", type: "" });
 
         try {
-            const { data } = await axios.post(`${API_URL}/api/user/register`, formData);
-            console.log("SignUp Successful", data)
+            await axios.post(`${API_URL}/api/user/register`, formData);
+
             setMessage({ text: "Registration successful! Please check your email to verify your account.", type: "success" });
             setFormData(INITIAL_FORM);
 
@@ -34,7 +37,7 @@ const SignUp = ({ onSwitchMode }) => {
             }, 3000);
 
         } catch (err) {
-            console.log("SignUp Error: ", err);
+
             setMessage({ text: err.response?.data?.message || "Something went wrong. Please try again.", type: "error" });
 
         }

@@ -32,6 +32,8 @@ import TaskPreviewModal from "../components/TaskPreviewModal";
 import axios from "axios";
 
 
+const API_BASE = `${(import.meta.env.VITE_API_URL ?? "http://localhost:5000").replace(/\/+$/, "")
+    }/api/tasks`;
 
 const Dashboard = () => {
     const { tasks = [], refreshTasks } = useOutletContext();
@@ -111,7 +113,10 @@ const Dashboard = () => {
                 if (taskData.id) {
                     await axios.put(
                         `${API_BASE}/${taskData.id}`,
-                        taskData
+                        taskData,
+                        {
+                            headers: getAuthHeaders(),
+                        }
                     );
                 }
                 refreshTasks();
@@ -124,7 +129,6 @@ const Dashboard = () => {
         [refreshTasks]
     );
 
-    const API_BASE = `${import.meta.env.VITE_API_URL}/api/tasks`;
 
     const getAuthHeaders = () => {
         const token = localStorage.getItem("token");
@@ -156,7 +160,7 @@ const Dashboard = () => {
                 completed: newStatus,
             }));
         } catch (err) {
-            console.error(err);
+            console.error("Failed to update task:", err);
         }
     };
 

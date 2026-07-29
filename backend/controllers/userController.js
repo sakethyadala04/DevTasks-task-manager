@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { verifyGoogleToken } from "../services/googleAuthService.js";
+import validator from "validator";
 
 import { generateVerificationToken, hashToken } from "../utils/tokenUtils.js";
 import Task from "../models/taskModel.js";
@@ -83,7 +84,6 @@ export const registerUser = async (req, res) => {
       name: newUser.name,
       token: verificationToken,
     });
-    console.log("STEP 6: Back inside registerUser()");
 
     return res.status(201).json({
       success: true,
@@ -162,6 +162,13 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email.",
+      });
+    }
+
     const user = await User.findOne({ email });
 
     // Always return the same response for security
@@ -220,7 +227,7 @@ export const resetPassword = async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters long",
+        message: "Password must be at least 8 characters long",
       });
     }
 
@@ -409,7 +416,7 @@ export const changePassword = async (req, res) => {
 // Google Login
 
 export const googleLogin = async (req, res) => {
-  console.log("Google login route hit");
+
   try {
     const { credential } = req.body;
 
@@ -501,10 +508,6 @@ export const resendVerificationEmail = async (req, res) => {
 
     const users = await User.find();
 
-    console.log("Email received:", email);
-    console.log("User found:", user);
-    console.log("All users:", users.map(u => u.email));
-
     if (!user) {
       return res.status(404).json({
         message: "User not found.",
@@ -535,8 +538,11 @@ export const resendVerificationEmail = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("resendVerificationEmail error:", error);
+
     return res.status(500).json({
-      message: error.message,
+      success: false,
+      message: "Server Error",
     });
   }
 };
