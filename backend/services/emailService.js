@@ -8,6 +8,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.BREVO_SMTP_LOGIN,
     pass: process.env.BREVO_SMTP_KEY,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 export const sendVerificationEmail = async ({ email, name, token }) => {
