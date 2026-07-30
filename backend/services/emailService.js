@@ -1,12 +1,19 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 export const sendVerificationEmail = async ({ email, name, token }) => {
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-  const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev",
+  await transporter.sendMail({
+    from: `"DevTasks" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Verify Your DevTasks Account",
     html: `
@@ -35,20 +42,13 @@ export const sendVerificationEmail = async ({ email, name, token }) => {
       </p>
     `,
   });
-
-  if (error) {
-    console.error("Verification email error:", error);
-    throw error;
-  }
-
-  return data;
 };
 
 export const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev",
+  await transporter.sendMail({
+    from: `"DevTasks" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Reset Your DevTasks Password",
     html: `
@@ -75,11 +75,4 @@ export const sendPasswordResetEmail = async (email, token) => {
       <p>If you didn't request a password reset, you can safely ignore this email.</p>
     `,
   });
-
-  if (error) {
-    console.error("Password reset email error:", error);
-    throw error;
-  }
-
-  return data;
 };
