@@ -1,26 +1,27 @@
-import nodemailer from "nodemailer";
+import { BrevoClient } from "@getbrevo/brevo";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_SMTP_LOGIN,
-    pass: process.env.BREVO_SMTP_KEY,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
+const brevo = new BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
 });
+
+const sender = {
+  name: "DevTasks",
+  email: process.env.BREVO_SENDER_EMAIL,
+};
 
 export const sendVerificationEmail = async ({ email, name, token }) => {
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-  await transporter.sendMail({
-    from: `"DevTasks" <${process.env.BREVO_SENDER_EMAIL}>`,
-    to: email,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender,
+    to: [
+      {
+        email,
+        name,
+      },
+    ],
     subject: "Verify Your DevTasks Account",
-    html: `
+    htmlContent: `
       <h2>Welcome to DevTasks, ${name}!</h2>
 
       <p>Thank you for creating an account.</p>
@@ -51,11 +52,15 @@ export const sendVerificationEmail = async ({ email, name, token }) => {
 export const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  await transporter.sendMail({
-    from: `"DevTasks" <${process.env.BREVO_SENDER_EMAIL}>`,
-    to: email,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender,
+    to: [
+      {
+        email,
+      },
+    ],
     subject: "Reset Your DevTasks Password",
-    html: `
+    htmlContent: `
       <h2>Reset Your Password</h2>
 
       <p>Click the button below to reset your password:</p>
