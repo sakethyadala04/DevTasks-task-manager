@@ -17,7 +17,7 @@ export const sendVerificationEmail = async ({ email, name, token }) => {
   const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
   await transporter.sendMail({
-    from: `"DevTasks" <${process.env.EMAIL_USER}>`,
+    from: `"DevTasks" <${process.env.BREVO_SENDER_EMAIL}>`,
     to: email,
     subject: "Verify Your DevTasks Account",
     html: `
@@ -52,7 +52,7 @@ export const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
   await transporter.sendMail({
-    from: `"DevTasks" <${process.env.EMAIL_USER}>`,
+    from: `"DevTasks" <${process.env.BREVO_SENDER_EMAIL}>`,
     to: email,
     subject: "Reset Your DevTasks Password",
     html: `
